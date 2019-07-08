@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -24,14 +25,23 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  double percentage;
+class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
+  double _currentPercentage;
+  double _newPercentage;
+  AnimationController _percentageController;
 
   @override
   void initState() {
     super.initState();
+    _percentageController = AnimationController(vsync: this, duration: Duration(milliseconds: 1000));
+    _percentageController.addListener(() {
+      setState(() {
+        _currentPercentage = lerpDouble(_currentPercentage, _newPercentage, _percentageController.value);
+      });
+    });
     setState(() {
-      percentage = 0.0;
+      _currentPercentage = 0.0;
+      _newPercentage = 0.0;
     });
   }
 
@@ -46,16 +56,20 @@ class _MyHomePageState extends State<MyHomePage> {
         width: 200,
         height: 200,
         child: CustomPaint(
-          foregroundPainter: _RadialPainter(lineColor: Colors.amber, completeColor: Colors.blueAccent, completePercent: percentage, width: 8.0),
+          foregroundPainter:
+              _RadialPainter(lineColor: Colors.amber, completeColor: Colors.blueAccent, completePercent: _currentPercentage, width: 8.0),
           child: Padding(
             padding: EdgeInsets.all(8),
             child: RaisedButton(
               onPressed: () {
                 setState(() {
-                  percentage += 10;
-                  if (percentage > 100) {
-                    percentage = 0;
+                  _currentPercentage = _newPercentage;
+                  _newPercentage += 10;
+                  if (_newPercentage > 100) {
+                    _newPercentage = 0;
+                    _currentPercentage = 0;
                   }
+                  _percentageController.forward(from: 0);
                 });
               },
               color: Colors.purple,
