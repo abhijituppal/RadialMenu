@@ -33,7 +33,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    _percentageController = AnimationController(vsync: this, duration: Duration(milliseconds: 1000));
+    _percentageController = AnimationController(vsync: this, duration: Duration(milliseconds: 10000));
     _percentageController.addListener(() {
       setState(() {
         _currentPercentage = lerpDouble(_currentPercentage, _newPercentage, _percentageController.value);
@@ -112,6 +112,17 @@ class _RadialPainter extends CustomPainter {
 
     final arcAngle = 2 * pi * (completePercent / 100);
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), -pi / 2, arcAngle, false, complete);
+
+// draws a yellow line
+    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), line);
+    canvas.save();
+    canvas.translate(size.width / 4, size.height / 4);
+// draws a green line after translation
+    line..color = Colors.green;
+    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), line);
+    canvas.restore();
+// draws a red over the original yellow line
+    canvas.drawLine(Offset(0, 0), Offset(size.width, size.height), line..color = Colors.red);
   }
 
   @override
